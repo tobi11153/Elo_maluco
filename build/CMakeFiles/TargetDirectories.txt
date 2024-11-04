@@ -1,0 +1,3 @@
+/home/tobi/Elo_maluco/build/CMakeFiles/Solucao_Elo_Maluco.dir
+/home/tobi/Elo_maluco/build/CMakeFiles/edit_cache.dir
+/home/tobi/Elo_maluco/build/CMakeFiles/rebuild_cache.dir
