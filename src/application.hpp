@@ -27,13 +27,26 @@ public:
 	int loadXML_example(string filename);
 	int  exec();
 	
-private:
+	//mover para espaço branco
+	void movevzo(char direcao);
 
+	//resolver
+	bool resolve(    std::vector<std::vector<std::vector<std::string>>>& caminhos
+);
+
+	//verificar se ja passou por esse caminho
+	bool samepath( std::vector<std::vector<std::vector<std::string>>>& caminhos);
+private:
+	int count;
 	int time;
 	tinyxml2::XMLDocument doc;
 
 	//estado atual do jogo
 	std::vector<std::vector<std::string>> estado;
+
+	//verificar se é solução
+	bool is_solution();
+
 
 
 private:
