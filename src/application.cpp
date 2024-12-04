@@ -1,234 +1,228 @@
-// Elo Maluco
-// application.cpp
-// Prof. Giovani Bernardes Vitor
-// ECOI2207 - 2024
-
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "application.hpp"
+#include <sstream>
+#include <algorithm>
 
 using namespace tinyxml2;
 
-///////////////////////////////////////////////////////////////////////
-// Application Class
-Application::Application(int argc, char **argv)
-{
-	Inicializa();
-}
+Application::Application(int argc, char **argv) { Inicializa(); }
+Application::~Application() {}
 
-//---------------------------------------------------------------------
-Application::~Application()
-{
-}
-//---------------------------------------------------------------------
-void Application::Inicializa(void)
-{
-	time = 0;
-	count = -2;
-}
-//---------------------------------------------------------------------
+void Application::Inicializa() { count = 0; }
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+// Desenhar o estado atual
 void Application::draw()
 {
-	std::cout << "Estado Atual do Jogo:" << std::endl;
-	for (const auto &linha : estado)
-	{
-		for (const auto &col : linha)
-		{
-			std::cout << col << " ";
-		}
-		std::cout << std::endl;
-	}
+    for (const auto &linha : estado)
+    {
+        for (const auto &col : linha)
+            std::cout << col << " ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
 }
-
-//---------------------------------------------------------------------
-/** @page Example_1 Load an XML File
- *  @dontinclude ./xmltest.cpp
- *  Basic XML file loading.
- *  The basic syntax to load an XML file from
- *  disk and check for an error. (ErrorID()
- *  will return 0 for no error.)
- *  @skip example_1()
- *  @until }
- *  https://github.com/leethomason/tinyxml2
- */
+/////////////////////////////////////////////////////////////////////////////////////////////
+// Carrega o estado inicial do XML
 int Application::loadXML_example(std::string filename)
 {
-	if (doc.LoadFile(filename.c_str()) != XML_SUCCESS)
-	{
-		return doc.ErrorID(); // Retorna o código de erro se houver falha no carregamento
-	}
+    if (doc.LoadFile(filename.c_str()) != XML_SUCCESS)
+        return doc.ErrorID();
 
-	// Limpa o estado atual antes de carregar novos dados
-	estado.clear();
+    estado.clear();
+    XMLElement *root = doc.FirstChildElement("EloMaluco");
+    if (!root)
+        return -1;
 
-	XMLElement *root = doc.FirstChildElement("EloMaluco");
-	if (!root)
-	{
-		return -1; // Erro: elemento raiz não encontrado
-	}
+    XMLElement *estadoAtual = root->FirstChildElement("EstadoAtual");
+    if (!estadoAtual)
+        return -1;
 
-	XMLElement *estadoAtual = root->FirstChildElement("EstadoAtual");
-	if (!estadoAtual)
-	{
-		return -1; // Erro: elemento EstadoAtual não encontrado
-	}
-
-	// Lê e armazena o estado atual do jogo
-	for (XMLElement *row = estadoAtual->FirstChildElement("row"); row != nullptr; row = row->NextSiblingElement("row"))
-	{
-		std::vector<std::string> linha;
-		for (XMLElement *col = row->FirstChildElement("col"); col != nullptr; col = col->NextSiblingElement("col"))
-		{
-			const char *texto = col->GetText();
-			linha.push_back(texto ? texto : "");
-		}
-		estado.push_back(linha);
-	}
-
-	std::cout << "Estado carregado com sucesso." << std::endl;
-	return 0; // Sucesso
+    for (XMLElement *row = estadoAtual->FirstChildElement("row"); row != nullptr; row = row->NextSiblingElement("row"))
+    {
+        std::vector<std::string> linha;
+        for (XMLElement *col = row->FirstChildElement("col"); col != nullptr; col = col->NextSiblingElement("col"))
+        {
+            const char *texto = col->GetText();
+            linha.push_back(texto ? texto : "");
+        }
+        estado.push_back(linha);
+    }
+    return 0;
 }
 
-//---------------------------------------------------------------------
+/////////////////////////////////////////////////////////////////////////////////////////////
 
-int Application::exec()
+// Verifica se o estado atual é solução
+bool Application::is_solution(const std::vector<std::vector<std::string>> &estadoAtual)
 {
-
-	// Executa o algoritmo para buscar a solução!!!
-
-	// Carrega arquivo XML de entrada... exemplo...
-	int errorID = loadXML_example(std::string("../data/EloMaluco_estadoInicialAcoes_teste01.xml"));
-
-	if (errorID)
-		std::cout << "Ocorreu um erro na leitura do arquivo..." << std::endl;
-	else
-		std::cout << "Arquivo XML carregado com sucesso..." << std::endl;
-	std::vector<std::vector<std::vector<std::string>>> caminhos;
-	draw();
-	resolve(caminhos);
-	draw();
-
-	std::cout << count;
-	return 0;
+    std::vector<std::vector<std::string>> estadoObjetivo = {
+        {"vms", "ams", "vds", "brs"},
+        {"vmm", "amm", "vdm", "brm"},
+        {"vmm", "amm", "vdm", "bri"},
+        {"vmi", "ami", "vdi", "vzo"}};
+    return estadoAtual == estadoObjetivo;
 }
 
-//---------------------------------------------------------------------
-// rotaciona a linha para a direita 'r' (right) ou para a esquerda 'l' (left)
+/////////////////////////////////////////////////////////////////////////////////////////////
 
-void Application::rotateRow(int row, char direcao)
+// Rotaciona uma linha
+void Application::rotateRow(std::vector<std::vector<std::string>> &estadoAtual, int row, char direcao)
 {
-	if (direcao == 'r')
-	{
-		std::vector<std::string> NovoEstado = {estado[row][3], estado[row][0], estado[row][1], estado[row][2]};
-		estado[row] = NovoEstado;
-	}
-	else if (direcao == 'l')
-	{
-		std::vector<std::string> NovoEstado = {estado[row][1], estado[row][2], estado[row][3], estado[row][0]};
-		estado[row] = NovoEstado;
-	}
-	else
-		std::cout << " Invalido" << endl;
+    if (direcao == 'r')
+        std::rotate(estadoAtual[row].rbegin(), estadoAtual[row].rbegin() + 1, estadoAtual[row].rend());
+    else if (direcao == 'l')
+        std::rotate(estadoAtual[row].begin(), estadoAtual[row].begin() + 1, estadoAtual[row].end());
 }
 
-//---------------------------------------------------------------------
+/////////////////////////////////////////////////////////////////////////////////////////////
 
-void Application::movevzo(char direcao)
+// Move o espaço vazio
+void Application::movevzo(std::vector<std::vector<std::string>> &estadoAtual, char direcao)
 {
-
-	for (int i = 0; i < estado.size(); i++)
-	{
-		for (int j = 0; j < estado[i].size(); j++)
-		{
-			if (estado[i][j] == "vzo")
-			{
-				if (direcao == 'u' && i != 0)
-				{
-					std::swap(estado[i][j], estado[i - 1][j]);
-				}
-				else if (direcao == 'd' && i != 3)
-				{
-					std::swap(estado[i][j], estado[i + 1][j]);
-				}
-			}
-		}
-	}
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            if (estadoAtual[i][j] == "vzo")
+            {
+                if (direcao == 'u' && i > 0)
+                    std::swap(estadoAtual[i][j], estadoAtual[i - 1][j]);
+                if (direcao == 'd' && i < 3)
+                    std::swap(estadoAtual[i][j], estadoAtual[i + 1][j]);
+                return;
+            }
+        }
+    }
 }
 
-//---------------------------------------------------------------------
+/////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Application::resolve(std::vector<std::vector<std::vector<std::string>>> &caminhos)
+// Heurística (distância de Manhattan)
+int Application::calcularHeuristica(const std::vector<std::vector<std::string>> &estadoAtual) {
+    int h = 0;
+    std::vector<std::vector<std::string>> estadoObjetivo = {
+        {"vms", "ams", "vds", "brs"},
+        {"vmm", "amm", "vdm", "brm"},
+        {"vmm", "amm", "vdm", "bri"},
+        {"vmi", "ami", "vdi", "vzo"}
+    };
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            for (int x = 0; x < 4; ++x) {
+                for (int y = 0; y < 4; ++y) {
+                    if (estadoAtual[i][j] == estadoObjetivo[x][y]) {
+                        h += abs(i - x) + abs(j - y);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return h;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+// Serializa o estado para formato único
+std::string Application::serializarEstado(const std::vector<std::vector<std::string>> &estadoAtual)
 {
-    // Checa se o estado atual é a solução
-    if (is_solution()) {
-        std::cout << "Solução encontrada!" << std::endl;
-        return true;
+    std::ostringstream oss;
+    for (const auto &linha : estadoAtual)
+        for (const auto &col : linha)
+            oss << col << ",";
+    return oss.str();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+// Algoritmo backtraking (usando distancia de manhatham A*)
+bool Application::resolve() {
+    std::priority_queue<Estado> fila;
+    std::unordered_set<std::string> caminhosVisitados;
+
+    // Estado inicial
+    Estado inicial;
+    inicial.estado = estado;
+    inicial.custo = 0;
+    inicial.heuristica = calcularHeuristica(estado);
+    inicial.caminho = "";
+
+    fila.push(inicial);
+    caminhosVisitados.insert(serializarEstado(inicial.estado));
+
+    std::cout << inicial.heuristica << std::endl;
+    
+    while (!fila.empty()) {
+        Estado atual = fila.top();
+        fila.pop();
+
+        if (is_solution(atual.estado)) {
+            std::cout << "Solução encontrada: " << atual.caminho << std::endl;
+            return true;
+        }
+
+        for (const auto &vizinho : gerarVizinhos(atual)) {
+            if (caminhosVisitados.find(serializarEstado(vizinho.estado)) == caminhosVisitados.end()) {
+                caminhosVisitados.insert(serializarEstado(vizinho.estado));
+                fila.push(vizinho);
+            }
+        }
     }
 
-    count++;
-
-    // Verifica se o estado atual já foi visitado para evitar loops
-    if (samepath(caminhos)) {
-        return false; // Se o estado já existe em caminhos, retorna para evitar recursão infinita
-    }
-
-    // Adiciona o estado atual aos caminhos visitados
-    caminhos.push_back(estado);
-
-
-    // Tentativa de resolver rotacionando a primeira linha para a direita
-    rotateRow(0, 'r');
-    if (resolve(caminhos)) return true; // Se a solução for encontrada, retorna
-    rotateRow(0, 'l'); // Desfaz a rotação
-
-    // Tentativa de resolver rotacionando a última linha para a direita
-    rotateRow(3, 'r');
-    if (resolve(caminhos)) return true; // Se a solução for encontrada, retorna
-    rotateRow(3, 'l'); // Desfaz a rotação
-
-    // Tentativa de mover 'vzo' para cima
-    movevzo('u');
-    if (resolve(caminhos)) return true; // Se a solução for encontrada, retorna
-    movevzo('d'); // Desfaz o movimento
-
-    // Tentativa de mover 'vzo' para baixo
-    movevzo('d');
-    if (resolve(caminhos)) return true; // Se a solução for encontrada, retorna
-    movevzo('u'); // Desfaz o movimento
-
-    // Remove o estado atual dos caminhos (backtracking)
-    caminhos.pop_back();
+    std::cout << "Solução não encontrada." << std::endl;
     return false;
 }
 
 
-//---------------------------------------------------------------------
+/////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Application::samepath(std::vector<std::vector<std::vector<std::string>>> &caminhos)
+// Execução
+int Application::exec()
 {
-	for (const auto &caminho : caminhos)
-	{
-		if (caminho == estado)
-		{
-			return true; // A matriz foi encontrada em caminhos
-		}
-	}
-	return false; // A matriz não foi encontrada em caminhos
+    int errorID = loadXML_example("../data/EloMaluco_estadoAtual_teste01.xml");
+    if (errorID)
+    {
+        std::cout << "Erro ao carregar XML." << std::endl;
+        return -1;
+    }
+    std::cout << "Estado inicial carregado." << std::endl;
+    draw();
+    return resolve() ? 0 : 1;
+    draw();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+
+std::vector<Estado> Application::gerarVizinhos(const Estado &atual) {
+    std::vector<Estado> vizinhos;
+
+    // Movimentos do espaço vazio
+    for (char dir : {'u', 'd'}) {
+        Estado novo = atual;
+        novo.caminho += dir;
+        movevzo(novo.estado, dir);
+        if (novo.estado != atual.estado) { // Só adiciona se o estado for diferente
+            novo.custo += 1;
+            novo.heuristica = calcularHeuristica(novo.estado);
+            vizinhos.push_back(novo);
+        }
+    }
+
+    // Rotação de linhas (apenas para topo e fundo)
+    for (int row : {0, 3}) { // Apenas linhas 0 e 3
+        for (char dir : {'l', 'r'}) {
+            Estado novo = atual;
+            novo.caminho += std::to_string(row) + dir;
+            rotateRow(novo.estado, row, dir);
+            if (novo.estado != atual.estado) { // Só adiciona se o estado for diferente
+                novo.custo += 1;
+                novo.heuristica = calcularHeuristica(novo.estado);
+                vizinhos.push_back(novo);
+            }
+        }
+    }
+
+    return vizinhos;
 }
 
 
-//---------------------------------------------------------------------
-
-bool Application::is_solution() {
-    // Defina o estado de solução alvo; cada linha representa o objetivo desejado
-    std::vector<std::vector<std::string>> estadoObjetivo = {
-        {"vms", "ams", "vds", "brs"},
-        {"vmm", "amm", "vdm", "brm"},
-        {"vmm", "amm", "vdm", "vzo"},
-        {"vmi", "ami", "vdi", "bri"}
-    };
-
-    // Verifica se o estado atual é igual ao estado objetivo
-    return estado == estadoObjetivo;
-}

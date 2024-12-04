@@ -26,11 +26,5 @@
           <col>vmm</col>
       </row>
   </EstadoAtual>
-  <Acoes>
-        <acao>rid</acao>
-        <acao>mfc</acao>
-        <acao>rsd</acao>
-        <acao>rie</acao>
-        <acao>mfb</acao>
-  </Acoes>
+
 </EloMaluco>
