@@ -2,7 +2,7 @@
 // application.cpp
 // Prof. Giovani Bernardes Vitor
 // ECOI2207 - 2024
-//Alunos: GABRIEL SOUZA SANTOS , ANA VICTÓRIA EVANGELISTA ARAÚJO ,  FABRICIO RICKELMER SOUZA DUARTE
+// Alunos: GABRIEL SOUZA SANTOS , ANA VICTÓRIA EVANGELISTA ARAÚJO ,  FABRICIO RICKELMER SOUZA DUARTE
 
 #include "application.hpp"
 
@@ -56,7 +56,7 @@ int Application::loadXML_example(std::string filename)
 
 //---------------------------------------------------------------------
 
-void Application::salvarXML( std::vector<std::vector<std::string>> &estadoInicial, const std::string &caminho)
+void Application::salvarXML(std::vector<std::vector<std::string>> &estadoInicial, const std::string &caminho)
 {
     XMLDocument doc;
 
@@ -127,7 +127,7 @@ void Application::salvarXML( std::vector<std::vector<std::string>> &estadoInicia
 //                              função Para geração aleatoria
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-//Função para criar uma entrada aleatoria, realizando movimentos aleatorias a partir do estado solução
+// Função para criar uma entrada aleatoria, realizando movimentos aleatorias a partir do estado solução
 std::vector<std::vector<std::string>> Application::gerarEntradaAleatoria(int dificuldade)
 {
     // Define o estado resolvido
@@ -178,10 +178,10 @@ std::vector<std::vector<std::string>> Application::gerarEntradaAleatoria(int dif
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 // Rotaciona uma linha do tabuleiro para a esquerda ou direit.
-//as entrada de row são sempre 0 para a linha superior ou 3 para a inferior
+// as entrada de row são sempre 0 para a linha superior ou 3 para a inferior
 void Application::rodarcoluna(std::vector<std::vector<std::string>> &estadoAtual, int row, char direcao)
 {
-    if (direcao == 'r')//se r rotaciona a direta,
+    if (direcao == 'r') // se r rotaciona a direta,
         std::rotate(estadoAtual[row].rbegin(), estadoAtual[row].rbegin() + 1, estadoAtual[row].rend());
     else if (direcao == 'l')
         std::rotate(estadoAtual[row].begin(), estadoAtual[row].begin() + 1, estadoAtual[row].end());
@@ -190,7 +190,7 @@ void Application::rodarcoluna(std::vector<std::vector<std::string>> &estadoAtual
 //---------------------------------------------------------------------
 
 // Move o espaço vazio (representado por "vzo") no tabuleiro em uma direção (cima ou baixo) u de up e d de down.
-//se vzo na ultima linha [3] não é possivel usar o d, e se na primeira linha [0] não é possivel usar o u
+// se vzo na ultima linha [3] não é possivel usar o d, e se na primeira linha [0] não é possivel usar o u
 void Application::movervzo(std::vector<std::vector<std::string>> &estadoAtual, char direcao)
 {
     for (int i = 0; i < 4; ++i)
@@ -215,24 +215,32 @@ void Application::movervzo(std::vector<std::vector<std::string>> &estadoAtual, c
 
 // Calcula a heurística (distância de Manhattan) para o estado atual.
 // A heurística mede a "distância" entre o estado atual e o estado objetivo.
-int Application::calcularHeuristica( std::vector<std::vector<std::string>> &estadoAtual)
+int Application::calcularHeuristica(std::vector<std::vector<std::string>> &estadoAtual)
 {
     int h = 0;
+
+    // Define o estado objetivo para comparação
     std::vector<std::vector<std::string>> estadoObjetivo = {
         {"vms", "ams", "vds", "brs"},
         {"vmm", "amm", "vdm", "brm"},
         {"vmm", "amm", "vdm", "bri"},
         {"vmi", "ami", "vdi", "vzo"}};
+
+    // Para cada peça no estado atual:
     for (int i = 0; i < 4; ++i)
     {
         for (int j = 0; j < 4; ++j)
-        {
+        { // Encontra a posição da mesma peça no estado objetivo
             for (int x = 0; x < 4; ++x)
             {
                 for (int y = 0; y < 4; ++y)
                 {
                     if (estadoAtual[i][j] == estadoObjetivo[x][y])
                     {
+                        // Calcula distância Manhattan: |Δx| + |Δy|
+                        // Onde Δx = diferença na coordenada horizontal
+                        // Δy = diferença na coordenada vertical
+
                         h += abs(i - x) + abs(j - y);
                         break;
                     }
@@ -246,11 +254,13 @@ int Application::calcularHeuristica( std::vector<std::vector<std::string>> &esta
 //---------------------------------------------------------------------
 // Gera todos os estados vizinhos possíveis a partir de um estado atual.
 // Inclui movimentos de linhas e do espaço vazio.
-std::vector<Estado> Application::gerarVizinhos( Estado &atual)
+std::vector<Estado> Application::gerarVizinhos(Estado &atual)
 {
+    // Vetor para armazenar todos os estados vizinhos possíveis
     std::vector<Estado> vizinhos;
 
-    // Rotação de linhas (apenas para topo e fundo)
+    // Estratégia 1: Rotação de Linhas
+    // Gera vizinhos pela rotação das linhas superior e inferior
     for (int row : {0, 3})
     {
         for (char dir : {'l', 'r'})
@@ -262,26 +272,31 @@ std::vector<Estado> Application::gerarVizinhos( Estado &atual)
                 novo.caminho += (dir == 'r') ? "r" : "l";
 
             rodarcoluna(novo.estado, row, dir);
+
+            // Verifica se o movimento gerou um estado diferente
             if (novo.estado != atual.estado)
             {
                 novo.custo += 1;
-                novo.heuristica = calcularHeuristica(novo.estado);
-                vizinhos.push_back(novo);
+                novo.heuristica = calcularHeuristica(novo.estado); // Recalcula heurística
+                vizinhos.push_back(novo);                          // Adiciona o novo estado aos vizinhos
             }
         }
     }
 
-    // Movimentos do espaço vazio
+    // Estratégia 2: Movimentação do Espaço Vazio
+    // Gera vizinhos movendo o espaço vazio para cima ou para baixo
     for (char dir : {'u', 'd'})
     {
         Estado novo = atual;
         novo.caminho += (dir == 'u') ? "U" : "D";
         movervzo(novo.estado, dir);
+
+        // Verifica se o movimento gerou um estado diferente
         if (novo.estado != atual.estado)
         {
             novo.custo += 1;
-            novo.heuristica = calcularHeuristica(novo.estado);
-            vizinhos.push_back(novo);
+            novo.heuristica = calcularHeuristica(novo.estado); // Recalcula heurística
+            vizinhos.push_back(novo);                          // Adiciona o novo estado aos vizinhos
         }
     }
 
@@ -291,7 +306,6 @@ std::vector<Estado> Application::gerarVizinhos( Estado &atual)
 /////////////////////////////////////////////////////////////////////////////////////////////
 //                              funções Auxiliares do codigo
 /////////////////////////////////////////////////////////////////////////////////////////////
-
 
 // Exibe o estado atual do tabuleiro no console.
 void Application::draw()
@@ -309,7 +323,7 @@ void Application::draw()
 
 // Verifica se o estado atual é a solução desejada.
 // Compara o estado atual com o estado objetivo.
-bool Application::is_solution( std::vector<std::vector<std::string>> &estadoAtual)
+bool Application::is_solution(std::vector<std::vector<std::string>> &estadoAtual)
 {
     std::vector<std::vector<std::string>> estadoObjetivo = {
         {"vms", "ams", "vds", "brs"},
@@ -323,13 +337,49 @@ bool Application::is_solution( std::vector<std::vector<std::string>> &estadoAtua
 
 // Serializa o estado do tabuleiro para uma string única.
 // Útil para armazenar estados visitados.
-std::string Application::serializarEstado( std::vector<std::vector<std::string>> &estadoAtual)
+std::string Application::serializarEstado(std::vector<std::vector<std::string>> &estadoAtual)
 {
     std::ostringstream oss;
     for (const auto &linha : estadoAtual)
         for (const auto &col : linha)
             oss << col << ",";
     return oss.str();
+}
+//---------------------------------------------------------------------
+
+void Application::mostrarCaminho(std::string &caminho)
+{
+    std::string acao;
+    for (char movimento : caminho)
+    {
+        switch (movimento)
+        {
+        case 'R':
+            acao = "rsd"; // Rotacionar linha superior para a direita
+            break;
+        case 'L':
+            acao = "rse"; // Rotacionar linha superior para a esquerda
+            break;
+        case 'r':
+            acao = "rid"; // Rotacionar linha inferior para a direita
+            break;
+        case 'l':
+            acao = "rie"; // Rotacionar linha inferior para a esquerda
+            break;
+        case 'U':
+            acao = "mfc"; // Mover face abaixo da vazia para cima
+            break;
+        case 'D':
+            acao = "mfb"; // Mover face acima da vazia para baixo
+            break;
+        default:
+            acao = "desconhecido"; // Caso algo inesperado ocorra
+            break;
+        }
+
+        std::cout << acao << " ";
+    }
+    std::cout << std::endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -341,6 +391,10 @@ std::string Application::serializarEstado( std::vector<std::vector<std::string>>
 
 bool Application::resolver()
 {
+    int exibir = 0; // a cada quantos movimentos ele deve exibir
+    std::cout << "a cada quantos movimentos gostaria de apresentar o estado do jogo?\nsugestão 20000 ou digite 0 para não exibir durante o processamento  ";
+    std::cin >> exibir;
+
     auto inicio = std::chrono::high_resolution_clock::now(); // Início da medição do tempo
 
     std::priority_queue<Estado> fila;
@@ -368,9 +422,10 @@ bool Application::resolver()
             auto fim = std::chrono::high_resolution_clock::now(); // Fim da medição do tempo
             std::chrono::duration<double> duracao = fim - inicio;
 
-            std::cout << "Solução encontrada em " << duracao.count() << " segundos." << std::endl;
+            std::cout << "\nSolução encontrada em " << duracao.count() << " segundos." << std::endl;
             std::cout << "Número de movimentos realizados: " << movimentos << std::endl;
-            std::cout << "Caminho encontrado:  " << atual.caminho << std::endl;
+            std::cout << "Caminho encontrado: ";
+            mostrarCaminho(atual.caminho); // Chama a nova função para exibir o caminho no formato desejado
 
             // Salva o estado final e ações em um arquivo XML
             salvarXML(estado, atual.caminho);
@@ -383,13 +438,26 @@ bool Application::resolver()
             return true;
         }
 
-        for ( auto &vizinho : gerarVizinhos(atual))
+        for (auto &vizinho : gerarVizinhos(atual))
         {
             if (caminhosVisitados.find(serializarEstado(vizinho.estado)) == caminhosVisitados.end())
             {
                 caminhosVisitados.insert(serializarEstado(vizinho.estado));
                 fila.push(vizinho);
                 movimentos++; // Incrementa o contador de movimentos
+
+                // desenha na tela o estado a cada 20000 movimentos
+                if (exibir != 0 && movimentos % exibir == 0 && movimentos > 0)
+                {
+                    std::cout << "Status após " << movimentos << " movimentos:" << std::endl;
+                    for (const auto &linha : atual.estado)
+                    {
+                        for (const auto &col : linha)
+                            std::cout << col << " ";
+                        std::cout << std::endl;
+                    }
+                    std::cout << "-------------------" << std::endl;
+                }
             }
         }
     }
@@ -432,7 +500,7 @@ int Application::exec()
 
         std::cin >> entrada;
         std::cout << "Carregando entrada existente...\n";
-        int errorID = loadXML_example( entrada);
+        int errorID = loadXML_example(entrada);
         if (errorID)
         {
             std::cout << "Erro ao carregar XML." << std::endl;

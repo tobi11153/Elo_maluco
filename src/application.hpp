@@ -88,6 +88,10 @@ private:
     // Gera um estado inicial aleatório com base no nível de dificuldade
     std::vector<std::vector<std::string>> gerarEntradaAleatoria(int dificuldade);
 
+    //dar output do caminho realiazado
+    void mostrarCaminho( std::string &caminho);
+
+
        // Resolve o tabuleiro usando o algoritmo de busca A*
     bool resolver();
 
