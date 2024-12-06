@@ -1,3 +1,9 @@
+// Elo Maluco
+// application.cpp
+// Prof. Giovani Bernardes Vitor
+// ECOI2207 - 2024
+//Alunos: GABRIEL SOUZA SANTOS , ANA VICTÓRIA EVANGELISTA ARAÚJO ,  FABRICIO RICKELMER SOUZA DUARTE
+
 #include "application.hpp"
 
 using namespace tinyxml2;

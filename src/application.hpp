@@ -1,3 +1,10 @@
+// Elo Maluco
+// main.cpp
+// Prof. Giovani Bernardes Vitor
+// ECOI2207- 2024
+//Alunos: GABRIEL SOUZA SANTOS , ANA VICTÓRIA EVANGELISTA ARAÚJO ,  FABRICIO RICKELMER SOUZA DUARTE
+
+
 #ifndef APPLICATION_HPP
 #define APPLICATION_HPP
 
