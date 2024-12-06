@@ -1,75 +1,59 @@
 <EloMaluco>
     <EstadoAtual>
         <row>
-            <col>ams</col>
+            <col>amm</col>
             <col>vdm</col>
-            <col>brm</col>
+            <col>brs</col>
+            <col>vds</col>
+        </row>
+        <row>
+            <col>vmm</col>
+            <col>vms</col>
+            <col>vzo</col>
             <col>vdm</col>
         </row>
         <row>
-            <col>vms</col>
-            <col>amm</col>
+            <col>vmm</col>
+            <col>ams</col>
             <col>vdi</col>
-            <col>brs</col>
+            <col>brm</col>
         </row>
         <row>
             <col>vmi</col>
             <col>ami</col>
             <col>amm</col>
-            <col>vmm</col>
-        </row>
-        <row>
-            <col>vds</col>
-            <col>vmm</col>
-            <col>vzo</col>
             <col>bri</col>
         </row>
     </EstadoAtual>
     <Acoes>
         <acao>rsd</acao>
         <acao>mfc</acao>
-        <acao>rie</acao>
-        <acao>mfb</acao>
-        <acao>rie</acao>
-        <acao>mfc</acao>
-        <acao>rid</acao>
-        <acao>mfb</acao>
-        <acao>rie</acao>
-        <acao>mfc</acao>
-        <acao>rid</acao>
-        <acao>mfb</acao>
-        <acao>rie</acao>
-        <acao>mfc</acao>
-        <acao>rid</acao>
-        <acao>mfb</acao>
-        <acao>rie</acao>
-        <acao>mfc</acao>
-        <acao>rid</acao>
-        <acao>mfc</acao>
-        <acao>mfc</acao>
-        <acao>rsd</acao>
-        <acao>mfb</acao>
-        <acao>mfb</acao>
-        <acao>mfb</acao>
-        <acao>rie</acao>
-        <acao>mfc</acao>
-        <acao>rid</acao>
-        <acao>rse</acao>
-        <acao>mfc</acao>
-        <acao>mfc</acao>
         <acao>rsd</acao>
         <acao>mfb</acao>
         <acao>rse</acao>
         <acao>mfc</acao>
         <acao>rse</acao>
         <acao>mfb</acao>
-        <acao>rse</acao>
+        <acao>rsd</acao>
         <acao>mfc</acao>
-        <acao>rsd</acao>
-        <acao>rsd</acao>
-        <acao>mfb</acao>
+        <acao>rse</acao>
         <acao>mfb</acao>
         <acao>mfb</acao>
         <acao>rie</acao>
+        <acao>mfb</acao>
+        <acao>rid</acao>
+        <acao>mfc</acao>
+        <acao>mfc</acao>
+        <acao>mfc</acao>
+        <acao>rse</acao>
+        <acao>mfb</acao>
+        <acao>rsd</acao>
+        <acao>rsd</acao>
+        <acao>mfc</acao>
+        <acao>rse</acao>
+        <acao>rse</acao>
+        <acao>mfb</acao>
+        <acao>mfb</acao>
+        <acao>mfb</acao>
     </Acoes>
 </EloMaluco>
