@@ -2,7 +2,7 @@
 <EloMaluco>
   <EstadoAtual>
       <row>
-          <col>vms</col>
+          <col>vsz</col>
           <col>vds</col>
           <col>brs</col>
           <col>vms</col>

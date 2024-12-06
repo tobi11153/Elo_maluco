@@ -16,9 +16,9 @@ int main(int argc, char** argv)
      int time=0;
 
      Application app(argc,argv);
-     
+     while(true){
      app.exec();
-     
+     }
 
      return 0;
 }

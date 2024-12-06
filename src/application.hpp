@@ -8,6 +8,9 @@
 #include <queue>
 #include <cmath>
 #include "tinyxml2.h"
+#include <cstdlib>  // Para std::srand() e std::rand()
+#include <ctime>    // Para std::time()
+
 
 // Estrutura para representar um estado
 struct Estado
@@ -27,38 +30,56 @@ struct Estado
 class Application
 {
 public:
+    // Construtor da aplicação
     Application(int argc, char **argv);
+
+    // Destrutor da aplicação
     ~Application();
 
+    // Desenha o estado atual do jogo
     void draw();
+
+    // Carrega um exemplo de tabuleiro a partir de um arquivo XML
     int loadXML_example(std::string filename);
+
+    // Executa a aplicação
     int exec();
 
 private:
-    int count;
-    tinyxml2::XMLDocument doc;
+    // Variáveis da aplicação
+    int count;                       // Contador genérico
+    tinyxml2::XMLDocument doc;       // Documento XML para leitura e escrita
+    std::vector<std::vector<std::string>> estado; // Estado inicial do jogo
 
-    // Estado inicial do jogo
-    std::vector<std::vector<std::string>> estado;
-
-    // Verificar se é a solução
+    // Verifica se o estado atual é uma solução
     bool is_solution(const std::vector<std::vector<std::string>> &estadoAtual);
 
-    // Função para inicializar o jogo
+    // Inicializa o jogo
     void Inicializa();
 
-    // Rotacionar uma linha
+    // Rotaciona uma linha do tabuleiro para a esquerda ou direita
     void rotateRow(std::vector<std::vector<std::string>> &estadoAtual, int row, char direcao);
 
-    // Mover o espaço vazio
+    // Move o espaço vazio (vzo) para cima ou para baixo
     void movevzo(std::vector<std::vector<std::string>> &estadoAtual, char direcao);
 
-    // Funções auxiliares para A*
+    // Calcula a heurística (estimativa de custo até o objetivo) de um estado
     int calcularHeuristica(const std::vector<std::vector<std::string>> &estadoAtual);
+
+    // Serializa o estado atual em uma string para facilitar comparação
     std::string serializarEstado(const std::vector<std::vector<std::string>> &estadoAtual);
+
+    // Gera os estados vizinhos possíveis a partir de um estado atual
     std::vector<Estado> gerarVizinhos(const Estado &atual);
-    // Algoritmo de busca A*
+
+    // Resolve o tabuleiro usando o algoritmo de busca A*
     bool resolve();
+
+    // Salva o estado inicial e o caminho encontrado em um arquivo XML
+    void salvarXML(const std::vector<std::vector<std::string>> &estadoInicial, const std::string &caminho);
+
+    // Gera um estado inicial aleatório com base no nível de dificuldade
+    std::vector<std::vector<std::string>> gerarEntradaAleatoria(int dificuldade);
 };
 
 #endif
