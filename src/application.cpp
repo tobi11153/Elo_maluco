@@ -1,8 +1,3 @@
-// Elo Maluco
-// application.cpp
-// Prof. Giovani Bernardes Vitor
-// ECOI2207 - 2024
-// Alunos: GABRIEL SOUZA SANTOS , ANA VICTÓRIA EVANGELISTA ARAÚJO ,  FABRICIO RICKELMER SOUZA DUARTE
 
 #include "application.hpp"
 
@@ -496,7 +491,7 @@ int Application::exec()
         // Carregamento de uma entrada existente a partir de um arquivo XML
         std::string entrada;
         std::cout << " Digite o Caminho  para o arquivo xml" << std::endl;
-        std::cout << "Exemplo: ../data/EloMaluco_estadoAtual_teste01.xml " << std::endl;
+        std::cout << "Exemplo: ../data/teste_01.xml " << std::endl;
 
         std::cin >> entrada;
         std::cout << "Carregando entrada existente...\n";
